@@ -1,0 +1,90 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users ────────────────────────────────────────────────
+    // A user doc is keyed by their auth uid. Anyone signed in can
+    // read the public role of a user; a user may only write their
+    // own doc, and may NEVER change their own role (prevents a
+    // student self-promoting to admin).
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == uid;
+      allow update: if request.auth.uid == uid
+                    && !('role' in request.resource.data.diff(resource.data).affectedKeys());
+      allow delete: if request.auth.uid == uid;
+    }
+
+    // ── studentProfiles ───────────────────────────────────────
+    // A student owns exactly one profile doc keyed by their uid.
+    // Anyone signed in may read profiles (needed to show the
+    // admin applicant lists later). Only the owner may write.
+    match /studentProfiles/{uid} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth.uid == uid;
+    }
+
+    // ── scholarships ─────────────────────────────────────────
+    // World-readable (so unauthenticated visitors can browse), but
+    // ONLY users whose /users/{uid}.role == 'admin' may write.
+    match /scholarships/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── savedScholarships ────────────────────────────────────
+    // Each saved record is owned by a student. Only the owner can
+    // read or write their own saved scholarships.
+    match /savedScholarships/{id} {
+      allow read: if request.auth != null
+                  && (resource == null
+                      || request.auth.uid == resource.data.uid);
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.uid;
+      allow update, delete: if request.auth != null
+                            && request.auth.uid == resource.data.uid;
+    }
+
+    // ── applications ─────────────────────────────────────────
+    // Application Tracker: one doc per student+scholarship (doc id
+    // `${uid}_${scholarshipId}`). Only the owner may read/write/delete.
+    match /applications/{id} {
+      allow read: if request.auth != null
+                  && (resource == null
+                      || request.auth.uid == resource.data.uid);
+      allow create, update: if request.auth != null
+                    && request.auth.uid == request.resource.data.uid;
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.uid;
+    }
+
+    // ── docChecklists ────────────────────────────────────────
+    // Document Checklist: one doc per student+scholarship. Owner-only.
+    match /docChecklists/{id} {
+      allow read: if request.auth != null
+                  && (resource == null
+                      || request.auth.uid == resource.data.uid);
+      allow create, update: if request.auth != null
+                    && request.auth.uid == request.resource.data.uid;
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.uid;
+    }
+
+    // ── scholarshipMeta ──────────────────────────────────────
+    // "Data last updated" metadata. Public read (dashboard shows it),
+    // admin-only write (only the ingestion function/admin writes it).
+    match /scholarshipMeta/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Helper functions ─────────────────────────────────────
+    // Returns true if the signed-in user's user doc has role 'admin'.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

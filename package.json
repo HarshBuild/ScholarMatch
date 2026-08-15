@@ -1,0 +1,32 @@
+{
+  "name": "scholarship-matcher",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Automatic Scholarship Matcher for Students — matches students to scholarships they are eligible for based on their profile.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "firebase": "^10.14.1",
+    "i18next": "^26.3.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.11",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^10.8.1",
+    "firebase-admin": "^14.2.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8",
+    "vite-plugin-pwa": "^1.3.0"
+  }
+}

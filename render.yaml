@@ -1,0 +1,48 @@
+# Render Blueprint for Scholarship Matcher (Static Site)
+# Docs: https://render.com/docs/blueprint-spec
+# Render detects this file and auto-configures the deploy.
+
+previewsEnabled: true
+
+services:
+  - type: web
+    name: scholarship-matcher
+    runtime: static
+    # Root directory of the repo (leave as . if at repo root)
+    rootDir: .
+    buildCommand: npm ci && npm run build
+    staticPath: dist
+    # SPA fallback: all routes serve index.html so React Router handles them.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      # Cache hashed assets forever (they are content-hashed by Vite)
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      # Never cache the HTML shell (so students always get the latest)
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+    envVars:
+      # Firebase web config (safe to expose — these are client-side keys).
+      # Set these in the Render dashboard under Environment, OR via the
+      # "Secret Files / Env Groups" feature. They are NOT committed to git.
+      - key: VITE_FIREBASE_API_KEY
+        sync: false
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: VITE_FIREBASE_PROJECT_ID
+        sync: false
+      - key: VITE_FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: VITE_FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: VITE_FIREBASE_APP_ID
+        sync: false
+      - key: VITE_FIREBASE_MEASUREMENT_ID
+        sync: false
+      - key: VITE_GROQ_API_KEY
+        sync: false

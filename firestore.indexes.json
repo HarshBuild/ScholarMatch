@@ -1,0 +1,22 @@
+// Firestore indexes needed by the app's queries.
+// Deploy with: firebase deploy --only firestore:indexes
+{
+  "indexes": [
+    {
+      "collectionGroup": "savedScholarships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "savedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "scholarships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deadline", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
