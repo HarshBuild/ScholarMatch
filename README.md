@@ -2,6 +2,8 @@
 
 ### Automatic Scholarship Matcher for Students
 
+Check OUT - https://scholarship-matcher-hmlp.onrender.com/
+
 ## 💡 About the Project
 
 **Scholarship Matcher** is a complete student assistant, not just a search engine. Students fill in their profile once and instantly see scholarships they qualify for — ranked by match percentage, complete with deadline reminders, document checklists, and actionable guidance for near-miss matches.
